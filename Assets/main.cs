@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
 public class NewBehaviourScript : MonoBehaviour
 {
     struct Level
@@ -10,9 +10,11 @@ public class NewBehaviourScript : MonoBehaviour
         public int[,] circles;
         public int size;
     }
+    private float counter = 0.5f;
     public Transform FCircle1, FCircle2, FCircle3, FCircle4;
     private float startPos;
     private float endPos;
+    private int lastIter = 0;
     private float minYtop;
     private float minYbot;
     private float perfectYtop;
@@ -28,8 +30,9 @@ public class NewBehaviourScript : MonoBehaviour
         minYbot = -4.61f;
         perfectYtop = -4.14f;
         perfectYbot = -4.34f;
+        MakeLevel(level);
     }
-    
+
     void MakeLevel(Level level)
     {
         float speed = -3.5f;
@@ -43,44 +46,67 @@ public class NewBehaviourScript : MonoBehaviour
             "0011" +
             "1101" +
             "";
-        level.size = lvl.Length/4;
+        level.size = lvl.Length / 4;
         level.speed = speed;
         level.circles = new int[lvl.Length / 4, 4];
-        for(int i = 0; i < lvl.Length; i += 4)
+        for (int i = 0; i < lvl.Length; i += 4)
         {
-            for(int k = 0; k < 4; k++)
+            for (int k = 0; k < 4; k++)
             {
-                level.circles[i / 4, k] = lvl[i + k];
+                level.circles[i / 4, k] = int.Parse(""+lvl[i + k]);
             }
         }
+        print(level.circles[0, 0]);
+        print(level.circles[2, 0]);
     }
-    void MoveCircles(Level level)
+    void SpawnCircles(Level level)
     {
-
-        for(int i = 0; i < level.size; i++)
+        if (counter < 0.4f)
         {
-            for(int k = 0; k < 4; k++)
+            counter += Time.deltaTime;
+            return;
+        }
+        
+        for (int k = 0; k < 4; k++)
+        {
+            if (level.circles[lastIter * 4, k] == 1)
             {
-                if (level.circles[i * 4,k]==1)
-                {
-                    switch (k){
-                        case 0:
-                            circs.Add(Instantiate(FCircle1.gameObject));
-                            break;
-                        case 1:
-                            circs.Add(Instantiate(FCircle2.gameObject));
-                            break;
-                        case 2:
-                            circs.Add(Instantiate(FCircle3.gameObject));
-                            break;
-                        case 3:
-                            circs.Add(Instantiate(FCircle4.gameObject));
-                            break;
-                    }
+                switch (k) {
+                    case 0:
+                        circs.Add(Instantiate(FCircle1.gameObject));
+                        counter = 0;
+                        break;
+                    case 1:
+                        circs.Add(Instantiate(FCircle2.gameObject));
+                        counter = 0;
+                        break;
+                    case 2:
+                        circs.Add(Instantiate(FCircle3.gameObject));
+                        counter = 0;
+                        break;
+                    case 3:
+                        circs.Add(Instantiate(FCircle4.gameObject));
+                        counter = 0;
+                        break;
                 }
             }
         }
+    lastIter += 1;
+    if(lastIter == level.size / 4)
+        {
+            lastIter = 0;
+        }
     }
+   
+    void MoveCircles()
+    {
+        foreach ( var item in circs)
+        {
+            item.transform.position = new Vector3(item.transform.position.x, item.transform.position.y+level.speed*Time.deltaTime);
+            if (item.transform.position.y < endPos) circs.Remove(item);
+        }
+    }
+    
 
     void Click()
     {
@@ -90,18 +116,19 @@ public class NewBehaviourScript : MonoBehaviour
             foreach (var item in circs)
             {
                 if(item.transform.position.x == FCircle1.position.x)
-            }
-            if(FCircle1.position.y < minYtop && FCircle1.position.y > minYbot)
-            {
-                if(FCircle1.position.y < perfectYtop && FCircle1.position.y > perfectYbot)
                 {
-                    print("1 perfect");
+                    if(item.transform.position.y < minYtop && item.transform.position.y > minYbot)
+                    {
+                        if(item.transform.position.y < perfectYtop && item.transform.position.y > perfectYbot)
+                        {
+                            print("1 perfect");
+                        }
+                        else
+                        {
+                            print("1 good");
+                        }
+                    }
                 }
-                else
-                {
-                    print("1 good");
-                }
-                FCircle1.position = FCircle1.position = new Vector3(FCircle1.position.x, startPos);
             }
         }
         #endregion f1
@@ -160,8 +187,8 @@ public class NewBehaviourScript : MonoBehaviour
 
     void Update()
     {
-        MakeLevel(level);
-        MoveCircles(level);
+        SpawnCircles(level);
+        MoveCircles();
         Click();
     }
 }
