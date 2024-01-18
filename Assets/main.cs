@@ -7,36 +7,32 @@ public class NewBehaviourScript : MonoBehaviour
 {
     class Level
     {
-        public float speed;
+        public float bpm;
         public int[,] circles;
     }
+
     public TextMeshPro text;
-    private float counter;
-    private float spaces = 0.4f;
     public Transform FCircle1, FCircle2, FCircle3, FCircle4;
-    private float endPos;
+    
     private int lastIter = 0;
+    private float counter;
+    private float endPos;
     private float minYtop;
     private float minYbot;
     private float perfectYtop;
     private float perfectYbot;
     string lvl = "" +
-                "1001" +
-                "0000" +
-                "1001" +
-                "0000" +
-                "0011" +
-                "0011" +
-                "0011" +
-                "1101" +
+        "1000" +
+        "0100" +
+        "0010" +
+        "0001" +
                 "";
     private List<GameObject> circs = new List<GameObject>();
     Level level = new Level();
 
     void MakeLevel(Level level)
     {
-        float speed = -3.5f;
-        level.speed = speed;
+        level.bpm = 120f;
         level.circles = new int[lvl.Length / 4, 4];
         for (int i = 0; i < lvl.Length; i += 4)
         {
@@ -45,11 +41,11 @@ public class NewBehaviourScript : MonoBehaviour
                 level.circles[i / 4, k] = int.Parse(""+lvl[i + k]);
             }
         }
-        counter = level.speed / spaces * -1f;
+        counter = 60f / level.bpm;
     }
     void SpawnCircles(Level level)
     {
-        if (counter < spaces*level.speed/-3.5f)
+        if (counter < 60f/level.bpm)
         {
             counter += Time.deltaTime;
             return;
@@ -88,7 +84,7 @@ public class NewBehaviourScript : MonoBehaviour
     {
         for ( int i=0;i<circs.Count;i++)
         {
-            circs[i].transform.position = new Vector3(circs[i].transform.position.x, circs[i].transform.position.y + level.speed*Time.deltaTime);
+            circs[i].transform.position = new Vector3(circs[i].transform.position.x, circs[i].transform.position.y + level.bpm/-51f*Time.deltaTime);
             if (circs[i].transform.position.y < endPos)
             {
                 Destroy(circs[i]);
@@ -102,13 +98,13 @@ public class NewBehaviourScript : MonoBehaviour
         #region f1
         if (Input.GetKey(KeyCode.H))
         {
-            foreach (var item in circs)
+            for (int i = 0; i < circs.Count; i++)
             {
-                if (item.transform.position.x == FCircle1.position.x)
+                if (circs[i].transform.position.x == FCircle1.position.x)
                 {
-                    if (item.transform.position.y < minYtop && item.transform.position.y > minYbot)
+                    if (circs[i].transform.position.y < minYtop && circs[i].transform.position.y > minYbot)
                     {
-                        if (item.transform.position.y < perfectYtop && item.transform.position.y > perfectYbot)
+                        if (circs[i].transform.position.y < perfectYtop && circs[i].transform.position.y > perfectYbot)
                         {
                             print("1: perfect");
                         }
@@ -116,6 +112,9 @@ public class NewBehaviourScript : MonoBehaviour
                         {
                             print("1: good");
                         }
+                        Destroy(circs[i]);
+                        circs.Remove(circs[i]);
+                        i = -1;
                     }
                 }
             }
@@ -124,13 +123,13 @@ public class NewBehaviourScript : MonoBehaviour
         #region f2
         if (Input.GetKey(KeyCode.J))
         {
-            foreach (var item in circs)
+            for (int i = 0; i < circs.Count; i++)
             {
-                if (item.transform.position.x == FCircle2.position.x)
+                if (circs[i].transform.position.x == FCircle2.position.x)
                 {
-                    if (item.transform.position.y < minYtop && item.transform.position.y > minYbot)
+                    if (circs[i].transform.position.y < minYtop && circs[i].transform.position.y > minYbot)
                     {
-                        if (item.transform.position.y < perfectYtop && item.transform.position.y > perfectYbot)
+                        if (circs[i].transform.position.y < perfectYtop && circs[i].transform.position.y > perfectYbot)
                         {
                             print("2: perfect");
                         }
@@ -138,64 +137,73 @@ public class NewBehaviourScript : MonoBehaviour
                         {
                             print("2: good");
                         }
-                    }
-                }
-            }
-            #endregion f2
-        #region f3
-            if (Input.GetKey(KeyCode.K))
-            {
-                foreach (var item in circs)
-                {
-                    if (item.transform.position.x == FCircle3.position.x)
-                    {
-                        if (item.transform.position.y < minYtop && item.transform.position.y > minYbot)
-                        {
-                            if (item.transform.position.y < perfectYtop && item.transform.position.y > perfectYbot)
-                            {
-                                print("3: perfect");
-                            }
-                            else
-                            {
-                                print("3: good");
-                            }
-                        }
-                    }
-                }
-            }
-            #endregion f3
-        #region f4
-            if (Input.GetKey(KeyCode.K))
-            {
-                foreach (var item in circs)
-                {
-                    if (item.transform.position.x == FCircle4.position.x)
-                    {
-                        if (item.transform.position.y < minYtop && item.transform.position.y > minYbot)
-                        {
-                            if (item.transform.position.y < perfectYtop && item.transform.position.y > perfectYbot)
-                            {
-                                print("4: perfect");
-                            }
-                            else
-                            {
-                                print("4: good");
-                            }
-                        }
+                        Destroy(circs[i]);
+                        circs.Remove(circs[i]);
+                        i = -1;
                     }
                 }
             }
         }
-       #endregion f4
+        #endregion f2
+        #region f3
+        if (Input.GetKey(KeyCode.K))
+        {
+            for (int i = 0; i < circs.Count; i++)
+            {
+                if (circs[i].transform.position.x == FCircle3.position.x)
+                {
+                    if (circs[i].transform.position.y < minYtop && circs[i].transform.position.y > minYbot)
+                    {
+                        if (circs[i].transform.position.y < perfectYtop && circs[i].transform.position.y > perfectYbot)
+                        {
+                            print("3: perfect");
+                        }
+                        else
+                        {
+                            print("3: good");
+                        }
+                        Destroy(circs[i]);
+                        circs.Remove(circs[i]);
+                        i = -1;
+                    }
+                }
+            }
+        }
+        #endregion f3
+        #region f4
+        if (Input.GetKey(KeyCode.L))
+        {
+            for (int i = 0; i < circs.Count; i++)
+            {
+                if (circs[i].transform.position.x == FCircle4.position.x)
+                {
+                    if (circs[i].transform.position.y < minYtop && circs[i].transform.position.y > minYbot)
+                    {
+                        if (circs[i].transform.position.y < perfectYtop && circs[i].transform.position.y > perfectYbot)
+                        {
+                            print("4: perfect");
+                        }
+                        else
+                        {
+                            print("4: good");
+                        }
+                        Destroy(circs[i]);
+                        circs.Remove(circs[i]);
+                        i = -1;
+                    }
+                }
+            }
+        }
+        #endregion f4
     }
 
     void Start()
     {
         endPos = -5.29f;
-        minYtop = -3.9f;
-        minYbot = -4.61f;
-        perfectYtop = -4.14f;
-        perfectYbot = -4.34f;
+        minYtop = -3.87f;
+        minYbot = -4.20f;
+        perfectYtop = -3.92f;
+        perfectYbot = -4.08f;
         MakeLevel(level);
     }
     void Update()
@@ -203,6 +211,5 @@ public class NewBehaviourScript : MonoBehaviour
         SpawnCircles(level);
         MoveCircles();
         Click();
-        
     }
 }
