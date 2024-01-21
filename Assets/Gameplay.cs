@@ -15,8 +15,8 @@ public class Gameplay : MonoBehaviour
     public Transform BCyl1, BCyl2, BCyl3, BCyl4;
     public ParticleSystem ps1, ps2, ps3, ps4;
     public ParticleSystem psg1, psg2, psg3, psg4;
-    public TextMeshPro textH, textJ, textK,textL;
-    public int bpm;
+    public TextMeshPro textH, textJ, textK,textL,textScore,textMult;
+    public float bpm =120f;
 
     private int lastIter = 0;
     private float counter;
@@ -26,6 +26,10 @@ public class Gameplay : MonoBehaviour
     private float minYbot;
     private float perfectYtop;
     private float perfectYbot;
+    private int score = 0;
+    private int perfInd;
+    private int multiplier = 1;
+    private float multProgress = 0;
     string lvl = "" +
         "1000" +
         "0100" +
@@ -114,12 +118,12 @@ public class Gameplay : MonoBehaviour
                         if (circs[i].transform.position.y < perfectYtop && circs[i].transform.position.y > perfectYbot)
                         {
                             ps1.Play();
-                            perf[0] = 2;
+                            perfInd = 2;
                         }
                         else
                         {
                             psg1.Play();
-                            perf[0] = 1;
+                            perfInd = 1;
                         }
                         Destroy(circs[i]);
                         circs.Remove(circs[i]);
@@ -127,10 +131,11 @@ public class Gameplay : MonoBehaviour
                     }
                     else
                     {
-                        perf[0] = -1;
+                        
                     }
                 }
             }
+            AddScore(perfInd);
         }
         else
         {
@@ -150,12 +155,12 @@ public class Gameplay : MonoBehaviour
                         if (circs[i].transform.position.y < perfectYtop && circs[i].transform.position.y > perfectYbot)
                         {
                             ps2.Play();
-                            perf[1] = 2;
+                            perfInd = 2;
                         }
                         else
                         {
                             psg2.Play();
-                            perf[1] = 1;
+                           perfInd = 1;
                         }
                         Destroy(circs[i]);
                         circs.Remove(circs[i]);
@@ -163,10 +168,11 @@ public class Gameplay : MonoBehaviour
                     }
                     else
                     {
-                        perf[1] = -1;
+
                     }
                 }
             }
+
         }
         else
         {
@@ -186,18 +192,18 @@ public class Gameplay : MonoBehaviour
                         if (circs[i].transform.position.y < perfectYtop && circs[i].transform.position.y > perfectYbot)
                         {
                             ps3.Play();
-                            perf[2] = 2;
+                            perfInd = 2;
                         }
                         else
                         {
                             psg3.Play();
-                            perf[2] = 1;
+                            perfInd = 1;
                         }
                         Destroy(circs[i]);
                         circs.Remove(circs[i]);
                         i = -1;
                     }
-                    perf[2] = -1;
+                    
                 }
             }
         }
@@ -219,18 +225,18 @@ public class Gameplay : MonoBehaviour
                         if (circs[i].transform.position.y < perfectYtop && circs[i].transform.position.y > perfectYbot)
                         {
                             ps4.Play();
-                            perf[3] = 2;
+                            perfInd = 2;
                         }
                         else
                         {
                             psg4.Play();
-                            perf[3] = 1;
+                            perfInd = 1;
                         }
                         Destroy(circs[i]);
                         circs.Remove(circs[i]);
                         i = -1;
                     }
-                    perf[3] = -1;
+                    
                 }
             }
         }
@@ -239,6 +245,8 @@ public class Gameplay : MonoBehaviour
             BCyl4.gameObject.GetComponent<SpriteRenderer>().color = new Color(0, 0, 0.6f);
         }
         #endregion f4
+        AddScore(perfInd);
+        perfInd = 0;
     }
 
     void Start()
@@ -250,28 +258,33 @@ public class Gameplay : MonoBehaviour
         perfectYbot = -4.08f;
         MakeLevel(level);
         showBinds = true;
+        score = 0;
     }
-
-    public int[] returnPerf()
+    public void AddScore(int perf)
     {
-        return perf;
-    }
-    public void resetPerf()
-    {
-        perf[0] = 0;
-        perf[1] = 0;
-        perf[2] = 0;
-        perf[3] = 0;
+        score += (perf==-1?0:perf) * 25;
+        multProgress += 1.5f * (perf==-1?perf*0:perf);
+        if (multProgress >= 25f)
+        {
+            textMult.gameObject.GetComponentInParent<SpriteRenderer>().color = Color.cyan;
+            multiplier = 2;
+        }
+        if (multProgress >= 90f) { multiplier = 3; textMult.GetComponentInParent<SpriteRenderer>().color = Color.yellow; }
+        if (multProgress >= 120f) { multiplier = 4; textMult.gameObject.GetComponentInParent<SpriteRenderer>().color = Color.green; }
+        if (multProgress >= 150f) { multiplier = 5; textMult.gameObject.GetComponentInParent<SpriteRenderer>().color = Color.magenta; }
+        if (multProgress < 25f) { multiplier = 1; textMult.gameObject.GetComponentInParent<SpriteRenderer>().color = Color.white; }
+        textScore.text = String.Format("{0:000000}", score);
+        textMult.text = multiplier.ToString();
     }
 
     void Update()
     {
         if (showBinds)
         {
-            textH.alpha -= Time.deltaTime/2;
-            textJ.alpha -= Time.deltaTime/2;
-            textK.alpha -= Time.deltaTime/2;
-            textL.alpha -= Time.deltaTime/2;
+            textH.alpha -= Time.deltaTime/1.5f;
+            textJ.alpha -= Time.deltaTime/1.5f;
+            textK.alpha -= Time.deltaTime/1.5f;
+            textL.alpha -= Time.deltaTime/1.5f;
             if (textH.alpha == 0f) showBinds = false;
         }
         SpawnCircles(level);
