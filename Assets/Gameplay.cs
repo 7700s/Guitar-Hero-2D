@@ -17,7 +17,7 @@ public class Gameplay : MonoBehaviour
     public ParticleSystem ps1, ps2, ps3, ps4;
     public ParticleSystem psg1, psg2, psg3, psg4;
     public TextMeshPro textH, textJ, textK,textL,textScore,textMult;
-    public AudioSource audio1;
+    public AudioSource audio1,audio2,audio3,audio4;
     private float bpm =144f;
 
     private int lastIter = 0;
@@ -145,6 +145,7 @@ public class Gameplay : MonoBehaviour
                         circs.Remove(circs[i]);
                         i = -1;
                         hits++;
+                        audio1.Play();
                     }
                     else
                     {
@@ -183,6 +184,7 @@ public class Gameplay : MonoBehaviour
                         circs.Remove(circs[i]);
                         i = -1;
                         hits++;
+                        audio2.Play();
                     }
                     else
                     {
@@ -221,6 +223,7 @@ public class Gameplay : MonoBehaviour
                         circs.Remove(circs[i]);
                         i = -1;
                         hits++;
+                        audio3.Play();
                     }
                     
                 }
@@ -255,6 +258,7 @@ public class Gameplay : MonoBehaviour
                         circs.Remove(circs[i]);
                         i = -1;
                         hits++;
+                        audio4.Play();
                     }
                 }
             }
