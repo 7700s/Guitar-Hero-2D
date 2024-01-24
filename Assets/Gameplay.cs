@@ -42,14 +42,6 @@ public class Gameplay : MonoBehaviour
         "0010" +
         "0001" +
         "0001" +
-        "1001" +
-        "0110" +
-        "1001" +
-        "0110" +
-        "1000" +
-        "0010" +
-        "0100" +
-        "1010" +
         "";
     private List<GameObject> circs = new List<GameObject>();
     private Level level = new Level();
