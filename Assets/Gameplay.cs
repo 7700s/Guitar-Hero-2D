@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using TMPro;
+using UnityEngine.SceneManagement;
 public class Gameplay : MonoBehaviour
 {
     class Level
@@ -16,7 +17,8 @@ public class Gameplay : MonoBehaviour
     public ParticleSystem ps1, ps2, ps3, ps4;
     public ParticleSystem psg1, psg2, psg3, psg4;
     public TextMeshPro textH, textJ, textK,textL,textScore,textMult;
-    public float bpm =120f;
+    public AudioSource audio1;
+    private float bpm =144f;
 
     private int lastIter = 0;
     private float counter;
@@ -30,16 +32,29 @@ public class Gameplay : MonoBehaviour
     private int perfInd;
     private int multiplier = 1;
     private float multProgress = 0;
+    private int hits = 0;
     string lvl = "" +
         "1000" +
+        "1000" +
+        "0100" +
         "0100" +
         "0010" +
+        "0010" +
         "0001" +
-                "";
+        "0001" +
+        "1001" +
+        "0110" +
+        "1001" +
+        "0110" +
+        "1000" +
+        "0010" +
+        "0100" +
+        "1010" +
+        "";
     private List<GameObject> circs = new List<GameObject>();
     private Level level = new Level();
     private int[] perf = new int[4];
-
+    
     void MakeLevel(Level level)
     {
         level.bpm = bpm;
@@ -87,6 +102,7 @@ public class Gameplay : MonoBehaviour
         if(lastIter == lvl.Length/4)
         {
             lastIter = 0;
+            //Invoke("EndGame",5);
         }
     }
 
@@ -94,7 +110,7 @@ public class Gameplay : MonoBehaviour
     {
         for ( int i=0;i<circs.Count;i++)
         {
-            circs[i].transform.position = new Vector3(circs[i].transform.position.x, circs[i].transform.position.y + level.bpm/-64f*Time.deltaTime);
+            circs[i].transform.position = new Vector3(circs[i].transform.position.x, circs[i].transform.position.y + level.bpm/-71f*Time.deltaTime);
             if (circs[i].transform.position.y < endPos)
             {
                 Destroy(circs[i]);
@@ -128,6 +144,7 @@ public class Gameplay : MonoBehaviour
                         Destroy(circs[i]);
                         circs.Remove(circs[i]);
                         i = -1;
+                        hits++;
                     }
                     else
                     {
@@ -165,6 +182,7 @@ public class Gameplay : MonoBehaviour
                         Destroy(circs[i]);
                         circs.Remove(circs[i]);
                         i = -1;
+                        hits++;
                     }
                     else
                     {
@@ -202,6 +220,7 @@ public class Gameplay : MonoBehaviour
                         Destroy(circs[i]);
                         circs.Remove(circs[i]);
                         i = -1;
+                        hits++;
                     }
                     
                 }
@@ -235,8 +254,8 @@ public class Gameplay : MonoBehaviour
                         Destroy(circs[i]);
                         circs.Remove(circs[i]);
                         i = -1;
+                        hits++;
                     }
-                    
                 }
             }
         }
@@ -247,6 +266,12 @@ public class Gameplay : MonoBehaviour
         #endregion f4
         AddScore(perfInd);
         perfInd = 0;
+
+        if (Input.GetKeyDown(KeyCode.Delete))
+        {
+            EndGame();
+        }
+        
     }
 
     void Start()
@@ -259,22 +284,36 @@ public class Gameplay : MonoBehaviour
         MakeLevel(level);
         showBinds = true;
         score = 0;
+        audio1.PlayDelayed(0f);
     }
     public void AddScore(int perf)
     {
         score += (perf==-1?0:perf) * 25;
         multProgress += 1.5f * (perf==-1?perf*0:perf);
-        if (multProgress >= 25f)
+        if (multProgress >= 100f)
         {
             textMult.gameObject.GetComponentInParent<SpriteRenderer>().color = Color.cyan;
             multiplier = 2;
         }
-        if (multProgress >= 90f) { multiplier = 3; textMult.GetComponentInParent<SpriteRenderer>().color = Color.yellow; }
-        if (multProgress >= 120f) { multiplier = 4; textMult.gameObject.GetComponentInParent<SpriteRenderer>().color = Color.green; }
-        if (multProgress >= 150f) { multiplier = 5; textMult.gameObject.GetComponentInParent<SpriteRenderer>().color = Color.magenta; }
-        if (multProgress < 25f) { multiplier = 1; textMult.gameObject.GetComponentInParent<SpriteRenderer>().color = Color.white; }
+        if (multProgress >= 200f) { multiplier = 3; textMult.GetComponentInParent<SpriteRenderer>().color = Color.yellow; }
+        if (multProgress >= 300f) { multiplier = 4; textMult.gameObject.GetComponentInParent<SpriteRenderer>().color = Color.green; }
+        if (multProgress >= 400f) { multiplier = 5; textMult.gameObject.GetComponentInParent<SpriteRenderer>().color = Color.magenta; }
+        if (multProgress < 100f) { multiplier = 1; textMult.gameObject.GetComponentInParent<SpriteRenderer>().color = Color.white; }
         textScore.text = String.Format("{0:000000}", score);
         textMult.text = multiplier.ToString();
+    }
+    public int[] returnScore()
+    {
+        int[] a = new int[2];
+        a[0] = score;
+        a[1] = hits;
+        return a;
+    }
+    public void EndGame()
+    {
+
+        SceneManager.LoadScene("Results",LoadSceneMode.Additive);
+        audio1.Stop();
     }
 
     void Update()
